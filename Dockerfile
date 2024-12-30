@@ -21,7 +21,5 @@ COPY . .
 RUN chown -R myuser:myuser /app
 RUN chmod -R 755 /app
 
-# need to leave WORKDIR as /app instead of /app/proj to preserve relative imports
-
 # Specify the command to run the application - not needed if using docker-compose
 # CMD ["gunicorn", "app:app", "-w", "4", "-b", "0.0.0.0:8000"]
