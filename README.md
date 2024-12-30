@@ -53,18 +53,25 @@
 
 ## Series Outline
 
-1. Get `flask_celery_app` example running locally using `docker-compose`
+1. Explain the codebase configurations to understand how the different components interact
+    * `docker-compose.yml` and each of the separate containers
+    * `nginx.conf`
+    * `Dockerfile` and `Dockerfile_nginx`
+    * environment variables
+    * `flask` app files and the configuration of the `celery` components
 
-2. Create working example of `flask_celery_app` on AWS using [ECS](https://aws.amazon.com/ecs/)
+2. Get `aws_flask_celery_app` example running locally using `docker-compose`
+
+3. Create working example of `aws_flask_celery_app` on AWS using [ECS](https://aws.amazon.com/ecs/)
     * will not be production ready
     * will rely on a lot of default values provided by AWS, with no networking setup by us
 
-3. Create production-ready example of microservices on AWS using [ECS](https://aws.amazon.com/ecs/)
+4. Create production-ready example of microservices on AWS using [ECS](https://aws.amazon.com/ecs/)
     * configure networking setup and apply that to ECS components
 
-4. Use GitHub Actions to automate deployments to AWS ECS components, referred to as Continuous Deployment (CD)
+5. Use GitHub Actions to automate deployments to AWS ECS components, referred to as Continuous Deployment (CD)
 
-5. Create networking setup and ECS components automatically with a single script using [AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/home.html)
+6. Create networking setup and ECS components automatically with a single script using [AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/home.html)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
