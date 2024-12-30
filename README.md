@@ -100,6 +100,11 @@
 
 * follow setup guides for [`aws-cli`](https://github.com/aws/aws-cli?tab=readme-ov-file#getting-started) if not already configured
 
+#### Google Mail Credentials
+
+* must have credentials for either gmail or another provider to send emails with
+* is using 2FA for gmail account, must get an app password from [here](https://myaccount.google.com/apppasswords)
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## AWS Cloud Development (CDK)
