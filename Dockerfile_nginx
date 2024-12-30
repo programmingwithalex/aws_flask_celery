@@ -1,0 +1,15 @@
+# created separate Dockerfile for nginx instead of just relying on base image in `docker-compose.yml`
+# reason: copy `static` directory from `proj` to `nginx` file system so `nginx` can serve static files
+# leads to faster load times for static content like images, CSS, and JavaScript files
+
+FROM nginx:latest
+
+RUN mkdir static
+COPY proj/static/ /static/
+COPY ./nginx.conf /etc/nginx/nginx.conf
+
+# Expose port 80
+EXPOSE 80
+
+# Start Nginx when the container starts
+CMD ["nginx", "-g", "daemon off;"]

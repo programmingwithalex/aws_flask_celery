@@ -1,0 +1,145 @@
+# ****************************************************************************************************** #
+# This workflow will build and push a new container image to Amazon ECR,
+# and then will deploy a new task definition to Amazon ECS, when a release is created.
+# ****************************************************************************************************** #
+
+on:
+  # * uncomment to trigger on release creation
+  # release:
+  #   types: [created]
+  # * uncomment to trigger on pull requests to main branch
+  # pull_request:
+  #   branches: [ main ]
+  workflow_dispatch:  # manually trigger the workflow
+
+name: AWS ECS Deploy
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    env:
+      # shared between all services
+      AWS_ECR_REPOSITORY_NAME_NGINX: aws-flask-celery-demo-ecr-nginx
+      AWS_ECR_REPOSITORY_NAME_FLASK_CELERY: aws-flask-celery-demo-ecr-app
+      AWS_ECS_CLUSTER_NAME: aws-flask-celery-demo-cluster
+      AWS_ECS_SERVICE_NAME: aws-flask-celery-demo-service
+      # shared between all services
+      AWS_ECS_TASK_DEFINITION: aws-flask-celery-demo-task-definition
+
+      AWS_ECS_TASK_DEFINITION_CONTAINER_NAME_NGINX: nginx
+      AWS_ECS_TASK_DEFINITION_CONTAINER_NAME_FLASK: flask_app
+      AWS_ECS_TASK_DEFINITION_CONTAINER_NAME_RABBITMQ: rabbitmq
+      AWS_ECS_TASK_DEFINITION_CONTAINER_NAME_CELERY_WORKER: celery_worker
+      AWS_ECS_TASK_DEFINITION_CONTAINER_NAME_CELERY_BEAT: celery_beat
+      AWS_ECS_TASK_DEFINITION_CONTAINER_NAME_CELERY_FLOWER: celery_flower
+
+      AWS_DEFAULT_REGION: us-east-1
+      IMAGE_TAG: ${{ github.sha }}
+      # IMAGE_TAG: latest
+
+      DOCKER_IMAGE_RABBITMQ: rabbitmq  # https://hub.docker.com/_/rabbitmq
+      DOCKER_IMAGE_CELERY_FLOWER: mher/flower  # https://hub.docker.com/r/mher/flower
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@main
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@main
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_DEFAULT_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@main
+
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-deploy-image-ecr-nginx
+      uses: whoan/docker-build-with-cache-action@master
+      with:
+        username: "${{ secrets.AWS_ACCESS_KEY_ID }}"
+        password: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+        registry: ${{ steps.login-ecr.outputs.registry }}
+        image_name: ${{ env.AWS_ECR_REPOSITORY_NAME_NGINX }}
+        image_tag: ${{ env.IMAGE_TAG }}
+        push_image_and_stages: true  # creates second staging ECR repo to cache image for faster subsequent builds
+
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-deploy-image-ecr-app
+      uses: whoan/docker-build-with-cache-action@master
+      with:
+        username: "${{ secrets.AWS_ACCESS_KEY_ID }}"
+        password: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+        registry: ${{ steps.login-ecr.outputs.registry }}
+        image_name: ${{ env.AWS_ECR_REPOSITORY_NAME_FLASK_CELERY }}
+        image_tag: ${{ env.IMAGE_TAG }}
+        push_image_and_stages: true  # creates second staging ECR repo to cache image for faster subsequent builds
+
+    # ****************************************************************************************************** #
+    # * If your task definition file holds multiple containers in the containerDefinitions section which require
+    # * updated image URIs, chain multiple executions of this action together using the output value
+    # * from the first action for the task-definition input of the second.
+    # * reference: https://github.com/aws-actions/amazon-ecs-render-task-definition
+    - name: Render Amazon ECS task definition for container 1 (nginx)
+      id: render-container-nginx
+      uses: aws-actions/amazon-ecs-render-task-definition@master
+      with:
+        task-definition: task-definition.json
+        container-name: ${{ env.AWS_ECS_TASK_DEFINITION_CONTAINER_NAME_NGINX }}
+        image: ${{ steps.login-ecr.outputs.registry }}/${{ env.AWS_ECR_REPOSITORY_NAME_NGINX }}:${{ env.IMAGE_TAG }}
+
+    - name: Modify Amazon ECS task definition with container 2 (flask)
+      id: render-container-flask
+      uses: aws-actions/amazon-ecs-render-task-definition@master
+      with:
+        task-definition: ${{ steps.render-container-nginx.outputs.task-definition }}  # reference previous step id
+        container-name: ${{ env.AWS_ECS_TASK_DEFINITION_CONTAINER_NAME_FLASK }}
+        image: ${{ steps.login-ecr.outputs.registry }}/${{ env.AWS_ECR_REPOSITORY_NAME_FLASK_CELERY }}:${{ env.IMAGE_TAG }}
+
+    - name: Modify Amazon ECS task definition with container 3 (rabbitmq)
+      id: render-container-rabbitmq
+      uses: aws-actions/amazon-ecs-render-task-definition@master
+      with:
+        task-definition: ${{ steps.render-container-flask.outputs.task-definition }}  # reference previous step id
+        container-name: ${{ env.AWS_ECS_TASK_DEFINITION_CONTAINER_NAME_RABBITMQ }}
+        image: ${{ env.DOCKER_IMAGE_RABBITMQ }}
+
+    - name: Modify Amazon ECS task definition with container 4 (celery-worker)
+      id: render-container-celery-worker
+      uses: aws-actions/amazon-ecs-render-task-definition@master
+      with:
+        task-definition: ${{ steps.render-container-rabbitmq.outputs.task-definition }}  # reference previous step id
+        container-name: ${{ env.AWS_ECS_TASK_DEFINITION_CONTAINER_NAME_CELERY_WORKER }}
+        image: ${{ steps.login-ecr.outputs.registry }}/${{ env.AWS_ECR_REPOSITORY_NAME_FLASK_CELERY }}:${{ env.IMAGE_TAG }}
+
+    - name: Modify Amazon ECS task definition with container 5 (celery-beat)
+      id: render-container-celery-beat
+      uses: aws-actions/amazon-ecs-render-task-definition@master
+      with:
+        task-definition: ${{ steps.render-container-celery-worker.outputs.task-definition }}  # reference previous step id
+        container-name: ${{ env.AWS_ECS_TASK_DEFINITION_CONTAINER_NAME_CELERY_BEAT }}
+        image: ${{ steps.login-ecr.outputs.registry }}/${{ env.AWS_ECR_REPOSITORY_NAME_FLASK_CELERY }}:${{ env.IMAGE_TAG }}
+
+    - name: Modify Amazon ECS task definition with container 6 (celery-flower)
+      id: render-container-celery-flower
+      uses: aws-actions/amazon-ecs-render-task-definition@master
+      with:
+        task-definition: ${{ steps.render-container-celery-beat.outputs.task-definition }}  # reference previous step id
+        container-name: ${{ env.AWS_ECS_TASK_DEFINITION_CONTAINER_NAME_CELERY_FLOWER }}
+        image: ${{ env.DOCKER_IMAGE_CELERY_FLOWER }}
+    # ****************************************************************************************************** #
+
+
+    # set `target_group` `deregistration_delay` parameter to lower value, otherwise long time to deploy
+    # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/edit-target-group-attributes.html#deregistration-delay
+    - name: Deploy Amazon ECS task definition to ECS service in ECS cluster
+      id: ecs-deploy-task-definition-to-service
+      uses: aws-actions/amazon-ecs-deploy-task-definition@master
+      with:
+        task-definition: ${{ steps.render-container-celery-flower.outputs.task-definition }}
+        service: ${{ env.AWS_ECS_CLUSTER_NAME }}/${{ env.AWS_ECS_SERVICE_NAME }}
+        cluster: ${{ env.AWS_ECS_CLUSTER_NAME }}
+        wait-for-service-stability: false  # whether to wait for ECS service to reach stable state after deploying

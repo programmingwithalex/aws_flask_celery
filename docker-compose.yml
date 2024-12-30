@@ -1,0 +1,178 @@
+services:
+  # message broker for celery (alternative to redis)
+  rabbitmq:
+    image: rabbitmq  # https://hub.docker.com/_/rabbitmq
+    expose:  # container communication only, no host communication
+      - 5672  # default rabbitmq port
+    networks:
+      - mynetwork
+    container_name: rabbitmq
+    restart: always  # if container fails and exits docker-compose will spin it back up
+
+  # message broker for celery (alternative to rabbitmq)
+  # redis:
+  #   image: redis  # https://hub.docker.com/_/redis/
+  #   expose:
+  #     - 6379  # default port
+  #   networks:
+  #     - mynetwork
+  #   container_name: redis
+  #   restart: always
+
+  # pulls tasks from the broker (`rabbitmq`) and executes in `flask_app`
+  celery_worker:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile  # Dockerfile shared with `flask_app` to avoid having to build multiple Docker images
+    command: [
+      'python',
+      '-m',
+      'celery',
+      '-A',  # specify application to load
+      'proj.celery_app',
+      'worker',  # starts worker process
+      '-Q',  # speicify which queues to listen to
+      'celery',  # the queue the `celery workers` will listen to (can specify multiple queues)
+      '--loglevel=INFO',
+      '--pool=gevent',  # execution pool to use for running tasks
+      '--uid=myuser'  # matching `Dockerfile`, not required
+    ]
+    env_file:
+      - ./default.env
+    depends_on:
+      - rabbitmq
+      # - redis
+    networks:
+      - mynetwork
+    container_name: celery-worker
+    restart: always  # if container fails and exits docker-compose will spin it back up
+    # **************************** #
+    # * allows for debugging with pdb
+    # stdin_open: true
+    # tty: true
+    # **************************** #
+
+  # used for monitoring the celery workers
+  celery_flower:
+    image: mher/flower  # https://hub.docker.com/r/mher/flower
+    env_file:
+      - ./default.env
+    command: [
+      'python',
+      '-m',
+      'celery',
+      '--broker=amqp://guest:guest@rabbitmq:5672//',  # match port specified in `rabbitmq` container
+      # '--broker=redis://redis:6379/0',  # match port specified in `redis` container
+      'flower',
+      '--port=5555',  # default port for `celery_flower`
+      '--url-prefix=flower'
+    ]
+    expose:  # container communication only, no host communication
+      - 5555
+    depends_on:
+      - rabbitmq
+      # - redis
+      - celery_worker
+    networks:
+      - mynetwork
+    container_name: celery-flower
+    restart: always  # if container fails and exits docker-compose will spin it back up
+
+  # used to schedule celery tasks
+  celery_beat:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile  # Dockerfile shared with `flask_app` to avoid having to build multiple Docker images
+    command: [
+      'python',
+      '-m',
+      'celery',
+      '-A',
+      'proj.celery_app',
+      'beat',
+      '--loglevel=info'
+    ]
+    env_file:
+      - ./default.env
+    depends_on:
+      - rabbitmq
+      # - redis
+      - celery_worker
+    networks:
+      - mynetwork
+    container_name: celery-beat
+    restart: always  # if container fails and exits docker-compose will spin it back up
+
+  flask_app:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile  # Dockerfile shared with `flask_app` to avoid having to build two Docker images
+    # command: [
+    #   'python',
+    #   '-m',
+    #   'flask',
+    #   'run',
+    #   '--host=0.0.0.0'
+    # ]  # simpler command without gunicorn
+    command: [
+      'gunicorn',
+      '-b',
+      '0.0.0.0:5000',
+      'proj.app:flask_app',
+      '--workers=5',
+      '--timeout=100000'
+    ]
+    # ports:  # communication with host
+    #   - 5000:5000
+    expose:  # container communication only, no host communication
+      - 5000
+    # **************************** #
+    # * volume mounts project dir (current directory, '.') on host to /app (specified in Dockerfile) inside container
+    # * allows modifying code on the fly, without having to rebuild the image
+    volumes:
+     - .:/app
+    # **************************** #
+    env_file:
+      - ./default.env
+    depends_on:
+      - rabbitmq
+      # - redis
+      - celery_worker
+    networks:
+      - mynetwork
+    container_name: flask-app
+    restart: always  # if container fails and exits docker-compose will spin it back up
+    # **************************** #
+    # * allows for debugging with pdb
+    # stdin_open: true
+    # tty: true
+    # **************************** #
+
+  # will be entry point to access `flask_app` and `celery_flower` dashboard
+  nginx:
+    # ********************************************* #
+    # * not using image from Docker Hub b/c specifying custom `dockerfile`
+    #
+    # image: nginx:latest
+    # volumes:
+    #   - ./nginx.conf:/etc/nginx/nginx.conf
+    # ********************************************* #
+    build:
+      context: ./
+      dockerfile: ./Dockerfile_nginx
+    ports:  # communication with host
+      - 80:80
+    depends_on:
+      - flask_app
+      - celery_flower
+      - rabbitmq
+      # - redis
+      - celery_worker
+    networks:
+      - mynetwork
+    container_name: nginx
+    restart: always  # if container fails and exits docker-compose will spin it back up
+
+# shared network so all Docker service can communicate with each other
+networks:
+  mynetwork:
