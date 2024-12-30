@@ -8,7 +8,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = 'celery_flask_sandbox'
 version = '1.0.0'
-description = 'run `celery` and `celery_flower` with `flask` both locally and AWS with Docker'
+description = 'Guide on deploying a `flask` app on AWS running: `celery`, `celery_beat`, and `celery_flower`, with a `nginx` container as the entry point'
 readme = 'README.md'
 requires-python = '>=3.9'
 
