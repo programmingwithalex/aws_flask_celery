@@ -20,12 +20,12 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # shared between all services
-      AWS_ECR_REPOSITORY_NAME_NGINX: aws-flask-celery-demo-ecr-nginx
-      AWS_ECR_REPOSITORY_NAME_FLASK_CELERY: aws-flask-celery-demo-ecr-app
-      AWS_ECS_CLUSTER_NAME: aws-flask-celery-demo-cluster
-      AWS_ECS_SERVICE_NAME: aws-flask-celery-demo-service
+      AWS_ECR_REPOSITORY_NAME_NGINX: aws-flask-celery-ecr-nginx
+      AWS_ECR_REPOSITORY_NAME_FLASK_CELERY: aws-flask-celery-ecr-app
+      AWS_ECS_CLUSTER_NAME: aws-flask-celery-cluster
+      AWS_ECS_SERVICE_NAME: aws-flask-celery-service
       # shared between all services
-      AWS_ECS_TASK_DEFINITION: aws-flask-celery-demo-task-definition
+      AWS_ECS_TASK_DEFINITION: aws-flask-celery-task-definition
 
       AWS_ECS_TASK_DEFINITION_CONTAINER_NAME_NGINX: nginx
       AWS_ECS_TASK_DEFINITION_CONTAINER_NAME_FLASK: flask_app
