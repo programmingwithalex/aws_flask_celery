@@ -12,7 +12,7 @@ else:
 celery_app = Celery(
     "proj",
     # broker='pyamqp://guest@localhost//',  # running locally without Docker
-    broker=os.environ["CELERY_BROKER_URL"],
+    broker=CELERY_BROKER_URL,
     backend=CELERY_RESULT_BACKEND,
     include=["proj.tasks"],
 )
@@ -41,7 +41,7 @@ celery_app.conf.beat_schedule = {
         "schedule": 10.0,  # runs every 10 seconds
     },
 }
-celery_app.conf.timezone = "UTC"
+celery_app.conf.timezone = "UTC"  # type: ignore
 
 
 # ** uncomment to run locally **

@@ -35,7 +35,8 @@ services:
       'celery',  # the queue the `celery workers` will listen to (can specify multiple queues)
       '--loglevel=INFO',
       '--pool=gevent',  # execution pool to use for running tasks
-      '--uid=myuser'  # matching `Dockerfile`, not required
+      '--uid=myuser',  # matching `Dockerfile`, not required
+      'broker_connection_retry_on_startup=True'  # silence warning, not required
     ]
     env_file:
       - ./default.env
