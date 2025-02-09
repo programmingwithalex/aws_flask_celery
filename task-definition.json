@@ -1,0 +1,386 @@
+{
+    "taskDefinitionArn": "arn:aws:ecs:us-east-1:257492816994:task-definition/aws-flask-celery-task-definition:23",
+    "containerDefinitions": [
+        {
+            "name": "nginx",
+            "image": "257492816994.dkr.ecr.us-east-1.amazonaws.com/aws-flask-celery-ecr-nginx:latest",
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "name": "nginx",
+                    "containerPort": 80,
+                    "hostPort": 80,
+                    "protocol": "tcp",
+                    "appProtocol": "http"
+                }
+            ],
+            "essential": true,
+            "environment": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/aws-flask-celery-task-definition",
+                    "mode": "non-blocking",
+                    "awslogs-create-group": "true",
+                    "max-buffer-size": "25m",
+                    "awslogs-region": "us-east-1",
+                    "awslogs-stream-prefix": "ecs"
+                },
+                "secretOptions": []
+            },
+            "systemControls": []
+        },
+        {
+            "name": "flask_app",
+            "image": "257492816994.dkr.ecr.us-east-1.amazonaws.com/aws-flask-celery-ecr-app:latest",
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "name": "flask_app",
+                    "containerPort": 5000,
+                    "hostPort": 5000,
+                    "protocol": "tcp",
+                    "appProtocol": "http"
+                }
+            ],
+            "essential": true,
+            "command": [
+                "gunicorn",
+                "-b",
+                "0.0.0.0:5000",
+                "proj.app:flask_app",
+                "--workers=5",
+                "--timeout=100000"
+            ],
+            "environment": [],
+            "environmentFiles": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "secrets": [
+                {
+                    "name": "CELERY_BROKER_URL",
+                    "valueFrom": "arn:aws:ssm:us-east-1:257492816994:parameter/flask_celery/CELERY_BROKER_URL"
+                },
+                {
+                    "name": "CELERY_TASK_RESULT_EXPIRE_SECONDS",
+                    "valueFrom": "arn:aws:ssm:us-east-1:257492816994:parameter/flask_celery/CELERY_TASK_RESULT_EXPIRE_SECONDS"
+                },
+                {
+                    "name": "FLASK_APP_PATH",
+                    "valueFrom": "arn:aws:ssm:us-east-1:257492816994:parameter/flask_celery/FLASK_APP_PATH"
+                },
+                {
+                    "name": "FLASK_CONFIG",
+                    "valueFrom": "arn:aws:ssm:us-east-1:257492816994:parameter/flask_celery/FLASK_CONFIG"
+                },
+                {
+                    "name": "FLASK_SECRET_KEY",
+                    "valueFrom": "arn:aws:ssm:us-east-1:257492816994:parameter/flask_celery/FLASK_SECRET_KEY"
+                },
+                {
+                    "name": "MAIL_APP_PASSWORD",
+                    "valueFrom": "arn:aws:ssm:us-east-1:257492816994:parameter/flask_celery/MAIL_APP_PASSWORD"
+                },
+                {
+                    "name": "MAIL_PORT",
+                    "valueFrom": "arn:aws:ssm:us-east-1:257492816994:parameter/flask_celery/MAIL_PORT"
+                },
+                {
+                    "name": "MAIL_SERVER",
+                    "valueFrom": "arn:aws:ssm:us-east-1:257492816994:parameter/flask_celery/MAIL_SERVER"
+                },
+                {
+                    "name": "MAIL_USERNAME",
+                    "valueFrom": "arn:aws:ssm:us-east-1:257492816994:parameter/flask_celery/MAIL_USERNAME"
+                }
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/aws-flask-celery-task-definition",
+                    "mode": "non-blocking",
+                    "awslogs-create-group": "true",
+                    "max-buffer-size": "25m",
+                    "awslogs-region": "us-east-1",
+                    "awslogs-stream-prefix": "ecs"
+                },
+                "secretOptions": []
+            },
+            "systemControls": []
+        },
+        {
+            "name": "rabbitmq",
+            "image": "rabbitmq:3.12-management",
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "name": "rabbitmq",
+                    "containerPort": 5672,
+                    "hostPort": 5672,
+                    "protocol": "tcp",
+                    "appProtocol": "http"
+                }
+            ],
+            "essential": true,
+            "environment": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/aws-flask-celery-task-definition",
+                    "mode": "non-blocking",
+                    "awslogs-create-group": "true",
+                    "max-buffer-size": "25m",
+                    "awslogs-region": "us-east-1",
+                    "awslogs-stream-prefix": "ecs"
+                },
+                "secretOptions": []
+            },
+            "systemControls": []
+        },
+        {
+            "name": "celery_worker",
+            "image": "257492816994.dkr.ecr.us-east-1.amazonaws.com/aws-flask-celery-ecr-app:latest",
+            "cpu": 0,
+            "portMappings": [],
+            "essential": true,
+            "command": [
+                "python",
+                "-m",
+                "celery",
+                "-A",
+                "proj.celery_app",
+                "worker",
+                "-Q",
+                "celery",
+                "--loglevel=INFO",
+                "--pool=gevent",
+                "--uid=myuser",
+                "broker_connection_retry_on_startup=True"
+            ],
+            "environment": [],
+            "environmentFiles": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "secrets": [
+                {
+                    "name": "CELERY_BROKER_URL",
+                    "valueFrom": "arn:aws:ssm:us-east-1:257492816994:parameter/flask_celery/CELERY_BROKER_URL"
+                },
+                {
+                    "name": "CELERY_TASK_RESULT_EXPIRE_SECONDS",
+                    "valueFrom": "arn:aws:ssm:us-east-1:257492816994:parameter/flask_celery/CELERY_TASK_RESULT_EXPIRE_SECONDS"
+                },
+                {
+                    "name": "FLASK_APP_PATH",
+                    "valueFrom": "arn:aws:ssm:us-east-1:257492816994:parameter/flask_celery/FLASK_APP_PATH"
+                },
+                {
+                    "name": "FLASK_CONFIG",
+                    "valueFrom": "arn:aws:ssm:us-east-1:257492816994:parameter/flask_celery/FLASK_CONFIG"
+                },
+                {
+                    "name": "FLASK_SECRET_KEY",
+                    "valueFrom": "arn:aws:ssm:us-east-1:257492816994:parameter/flask_celery/FLASK_SECRET_KEY"
+                },
+                {
+                    "name": "MAIL_APP_PASSWORD",
+                    "valueFrom": "arn:aws:ssm:us-east-1:257492816994:parameter/flask_celery/MAIL_APP_PASSWORD"
+                },
+                {
+                    "name": "MAIL_PORT",
+                    "valueFrom": "arn:aws:ssm:us-east-1:257492816994:parameter/flask_celery/MAIL_PORT"
+                },
+                {
+                    "name": "MAIL_SERVER",
+                    "valueFrom": "arn:aws:ssm:us-east-1:257492816994:parameter/flask_celery/MAIL_SERVER"
+                },
+                {
+                    "name": "MAIL_USERNAME",
+                    "valueFrom": "arn:aws:ssm:us-east-1:257492816994:parameter/flask_celery/MAIL_USERNAME"
+                }
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/aws-flask-celery-task-definition",
+                    "mode": "non-blocking",
+                    "awslogs-create-group": "true",
+                    "max-buffer-size": "25m",
+                    "awslogs-region": "us-east-1",
+                    "awslogs-stream-prefix": "ecs"
+                },
+                "secretOptions": []
+            },
+            "systemControls": []
+        },
+        {
+            "name": "celery_beat",
+            "image": "257492816994.dkr.ecr.us-east-1.amazonaws.com/aws-flask-celery-ecr-app:latest",
+            "cpu": 0,
+            "portMappings": [],
+            "essential": true,
+            "command": [
+                "python",
+                "-m",
+                "celery",
+                "-A",
+                "proj.celery_app",
+                "beat",
+                "--loglevel=info"
+            ],
+            "environment": [],
+            "environmentFiles": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "secrets": [
+                {
+                    "name": "CELERY_BROKER_URL",
+                    "valueFrom": "arn:aws:ssm:us-east-1:257492816994:parameter/flask_celery/CELERY_BROKER_URL"
+                },
+                {
+                    "name": "CELERY_TASK_RESULT_EXPIRE_SECONDS",
+                    "valueFrom": "arn:aws:ssm:us-east-1:257492816994:parameter/flask_celery/CELERY_TASK_RESULT_EXPIRE_SECONDS"
+                },
+                {
+                    "name": "FLASK_APP_PATH",
+                    "valueFrom": "arn:aws:ssm:us-east-1:257492816994:parameter/flask_celery/FLASK_APP_PATH"
+                },
+                {
+                    "name": "FLASK_CONFIG",
+                    "valueFrom": "arn:aws:ssm:us-east-1:257492816994:parameter/flask_celery/FLASK_CONFIG"
+                },
+                {
+                    "name": "FLASK_SECRET_KEY",
+                    "valueFrom": "arn:aws:ssm:us-east-1:257492816994:parameter/flask_celery/FLASK_SECRET_KEY"
+                }
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/aws-flask-celery-task-definition",
+                    "mode": "non-blocking",
+                    "awslogs-create-group": "true",
+                    "max-buffer-size": "25m",
+                    "awslogs-region": "us-east-1",
+                    "awslogs-stream-prefix": "ecs"
+                },
+                "secretOptions": []
+            },
+            "systemControls": []
+        },
+        {
+            "name": "celery_flower",
+            "image": "mher/flower",
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "name": "celery_flower",
+                    "containerPort": 5555,
+                    "hostPort": 5555,
+                    "protocol": "tcp",
+                    "appProtocol": "http"
+                }
+            ],
+            "essential": true,
+            "command": [
+                "python",
+                "-m",
+                "celery",
+                "--broker=amqp://guest:guest@localhost:5672//",
+                "flower",
+                "--port=5555",
+                "--url-prefix=flower"
+            ],
+            "environment": [],
+            "environmentFiles": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "secrets": [
+                {
+                    "name": "CELERY_BROKER_URL",
+                    "valueFrom": "arn:aws:ssm:us-east-1:257492816994:parameter/flask_celery/CELERY_BROKER_URL"
+                },
+                {
+                    "name": "CELERY_TASK_RESULT_EXPIRE_SECONDS",
+                    "valueFrom": "arn:aws:ssm:us-east-1:257492816994:parameter/flask_celery/CELERY_TASK_RESULT_EXPIRE_SECONDS"
+                }
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/aws-flask-celery-task-definition",
+                    "mode": "non-blocking",
+                    "awslogs-create-group": "true",
+                    "max-buffer-size": "25m",
+                    "awslogs-region": "us-east-1",
+                    "awslogs-stream-prefix": "ecs"
+                },
+                "secretOptions": []
+            },
+            "systemControls": []
+        }
+    ],
+    "family": "aws-flask-celery-task-definition",
+    "taskRoleArn": "arn:aws:iam::257492816994:role/ecsTaskExecutionRole",
+    "executionRoleArn": "arn:aws:iam::257492816994:role/ecsTaskExecutionRole",
+    "networkMode": "awsvpc",
+    "revision": 23,
+    "volumes": [],
+    "status": "ACTIVE",
+    "requiresAttributes": [
+        {
+            "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+        },
+        {
+            "name": "ecs.capability.execution-role-awslogs"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.ecr-auth"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.28"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.task-iam-role"
+        },
+        {
+            "name": "ecs.capability.execution-role-ecr-pull"
+        },
+        {
+            "name": "ecs.capability.secrets.ssm.environment-variables"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+        },
+        {
+            "name": "ecs.capability.task-eni"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.29"
+        }
+    ],
+    "placementConstraints": [],
+    "compatibilities": [
+        "EC2",
+        "FARGATE"
+    ],
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "1024",
+    "memory": "3072",
+    "runtimePlatform": {
+        "cpuArchitecture": "X86_64",
+        "operatingSystemFamily": "LINUX"
+    },
+    "registeredAt": "2025-01-26T21:26:38.599Z",
+    "registeredBy": "arn:aws:iam::257492816994:root",
+    "tags": []
+}
