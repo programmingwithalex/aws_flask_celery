@@ -12,7 +12,7 @@ flask_app = create_app("production")
 @flask_app.route("/")
 def hello() -> str:
     """simple route to test Flask app"""
-    return "Hello, World!"
+    return "Hello, World 2!"
 
 
 # will be ignored if `/flower` specified as the route in `nginx.conf`
