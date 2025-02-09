@@ -19,12 +19,10 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     env:
-      # shared between all services
       AWS_ECR_REPOSITORY_NAME_NGINX: aws-flask-celery-ecr-nginx
       AWS_ECR_REPOSITORY_NAME_FLASK_CELERY: aws-flask-celery-ecr-app
       AWS_ECS_CLUSTER_NAME: aws-flask-celery-cluster
       AWS_ECS_SERVICE_NAME: aws-flask-celery-service
-      # shared between all services
       AWS_ECS_TASK_DEFINITION: aws-flask-celery-task-definition
 
       AWS_ECS_TASK_DEFINITION_CONTAINER_NAME_NGINX: nginx
@@ -131,7 +129,6 @@ jobs:
         container-name: ${{ env.AWS_ECS_TASK_DEFINITION_CONTAINER_NAME_CELERY_FLOWER }}
         image: ${{ env.DOCKER_IMAGE_CELERY_FLOWER }}
     # ****************************************************************************************************** #
-
 
     # set `target_group` `deregistration_delay` parameter to lower value, otherwise long time to deploy
     # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/edit-target-group-attributes.html#deregistration-delay
