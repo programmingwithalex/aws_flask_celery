@@ -63,6 +63,7 @@ jobs:
         registry: ${{ steps.login-ecr.outputs.registry }}
         image_name: ${{ env.AWS_ECR_REPOSITORY_NAME_NGINX }}
         image_tag: ${{ env.IMAGE_TAG }}
+        context: ./Dockerfile_nginx
         push_image_and_stages: true  # creates second staging ECR repo to cache image for faster subsequent builds
 
     - name: Build, tag, and push image to Amazon ECR (flask)
