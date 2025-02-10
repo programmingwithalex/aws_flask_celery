@@ -54,7 +54,7 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@main
 
-    - name: Build, tag, and push image to Amazon ECR
+    - name: Build, tag, and push image to Amazon ECR (nginx)
       id: build-deploy-image-ecr-nginx
       uses: whoan/docker-build-with-cache-action@master
       with:
@@ -65,7 +65,7 @@ jobs:
         image_tag: ${{ env.IMAGE_TAG }}
         push_image_and_stages: true  # creates second staging ECR repo to cache image for faster subsequent builds
 
-    - name: Build, tag, and push image to Amazon ECR
+    - name: Build, tag, and push image to Amazon ECR (flask)
       id: build-deploy-image-ecr-app
       uses: whoan/docker-build-with-cache-action@master
       with:
