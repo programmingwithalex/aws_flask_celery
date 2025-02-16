@@ -12,7 +12,6 @@
 <div align="center">
     <p>Copyright (c) 2024, <a href="https://github.com/programmingwithalex">GitHub@programmingwithalex</a></p>
 
-
   <h3 align="center">Flask & Celery - AWS Deployment</h3>
 
   <p align="center">
