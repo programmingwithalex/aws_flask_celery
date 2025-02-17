@@ -113,7 +113,7 @@
 #### Google Mail Credentials
 
 * must have credentials for either gmail or another provider to send emails with
-* is using 2FA for gmail account, must get an app password from [here](https://myaccount.google.com/apppasswords)
+* if using 2FA for gmail account, must get an app password from [here](https://myaccount.google.com/apppasswords)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
