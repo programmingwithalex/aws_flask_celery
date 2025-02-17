@@ -11,7 +11,7 @@ import os
 import boto3
 from dotenv import load_dotenv
 
-load_dotenv('default.env')
+load_dotenv('your.env')
 
 # Initialize the ECS client
 ecs = boto3.client('ecs')
