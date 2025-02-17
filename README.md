@@ -15,7 +15,7 @@
   <h3 align="center">Flask, Celery, & Nginx - AWS Deployment</h3>
 
   <p align="center">
-    Guide on deploying a `flask` app on AWS running: `celery`, `celery_beat`, and `celery_flower`, with a `nginx` container as the entry point
+    Guide on deploying a flask app on AWS running: celery, celery_beat, and celery_flower, with a nginx container as the entry point
     <br />
     <a href="https://github.com/programmingwithalex/aws_celery_flask">View Demo</a>
     ·
@@ -64,9 +64,11 @@
 3. Create working example of `aws_flask_celery_app` on AWS using [ECS](https://aws.amazon.com/ecs/)
     * will not be production ready
     * will rely on a lot of default values provided by AWS, with no networking setup by us
+    * `S3` for environment variable storage
 
 4. Create production-ready example of microservices on AWS using [ECS](https://aws.amazon.com/ecs/)
     * configure networking setup and apply that to ECS components
+    * `SSM Parameter Store` for environment variable storage
 
 5. Use GitHub Actions to automate deployments to AWS ECS components, referred to as Continuous Deployment (CD)
 
