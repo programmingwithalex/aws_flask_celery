@@ -12,7 +12,7 @@
 <div align="center">
     <p>Copyright (c) 2024, <a href="https://github.com/programmingwithalex">GitHub@programmingwithalex</a></p>
 
-  <h3 align="center">Flask & Celery - AWS Deployment</h3>
+  <h3 align="center">Flask, Celery, & Nginx - AWS Deployment</h3>
 
   <p align="center">
     Guide on deploying a `flask` app on AWS running: `celery`, `celery_beat`, and `celery_flower`, with a `nginx` container as the entry point
@@ -84,6 +84,8 @@
 * ECS Services
 * ECS Task Definitions
 * Application Load Balancer (ALB)
+* S3
+* SSM Parameter Store
 * AWS Cloud Development Kit (CDK)
   * written in Python
 
