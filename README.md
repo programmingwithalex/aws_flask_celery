@@ -19,9 +19,9 @@
     <br />
     <a href="https://www.youtube.com/watch?v=RBj7ctj5Sk8&list=PLbn3jWIXv_iZqYn-RxjzaGXrDTWa3OnNw&index=1">YouTube Demo</a>
     ·
-    <a href="https://github.com/programmingwithalex/aws_celery_flask/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
+    <a href="https://github.com/programmingwithalex/aws_flask_celery/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
     ·
-    <a href="https://github.com/programmingwithalex/aws_celery_flask/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
+    <a href="https://github.com/programmingwithalex/aws_flask_celery/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
   </p>
 </div>
 
@@ -149,13 +149,13 @@ npm install -g aws-cdk
 [CDK Workshop](https://cdkworkshop.com/)
 > Instructions on using the AWS Cloud Development Kit (CDK)
 
-[contributors-shield]: https://img.shields.io/github/contributors/programmingwithalex/aws_celery_flask?style=for-the-badge
-[contributors-url]: https://github.com/programmingwithalex/aws_celery_flask/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/programmingwithalex/aws_celery_flask?style=for-the-badge
-[forks-url]: https://github.com/programmingwithalex/aws_celery_flask/network/members
-[stars-shield]: https://img.shields.io/github/stars/programmingwithalex/aws_celery_flask?style=for-the-badge
-[stars-url]: https://github.com/programmingwithalex/aws_celery_flask/stargazers
-[issues-shield]: https://img.shields.io/github/issues/programmingwithalex/aws_celery_flask?style=for-the-badge
-[issues-url]: https://github.com/programmingwithalex/aws_celery_flask/issues
-[license-shield]: https://img.shields.io/github/license/programmingwithalex/aws_celery_flask.svg?style=for-the-badge
-[license-url]: https://github.com/programmingwithalex/aws_celery_flask/blob/main/LICENSE
+[contributors-shield]: https://img.shields.io/github/contributors/programmingwithalex/aws_flask_celery?style=for-the-badge
+[contributors-url]: https://github.com/programmingwithalex/aws_flask_celery/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/programmingwithalex/aws_flask_celery?style=for-the-badge
+[forks-url]: https://github.com/programmingwithalex/aws_flask_celery/network/members
+[stars-shield]: https://img.shields.io/github/stars/programmingwithalex/aws_flask_celery?style=for-the-badge
+[stars-url]: https://github.com/programmingwithalex/aws_flask_celery/stargazers
+[issues-shield]: https://img.shields.io/github/issues/programmingwithalex/aws_flask_celery?style=for-the-badge
+[issues-url]: https://github.com/programmingwithalex/aws_flask_celery/issues
+[license-shield]: https://img.shields.io/github/license/programmingwithalex/aws_flask_celery.svg?style=for-the-badge
+[license-url]: https://github.com/programmingwithalex/aws_flask_celery/blob/main/LICENSE
