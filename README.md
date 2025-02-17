@@ -10,14 +10,14 @@
 
 <br />
 <div align="center">
-    <p>Copyright (c) 2024, <a href="https://github.com/programmingwithalex">GitHub@programmingwithalex</a></p>
+    <p>Copyright (c) 2025, <a href="https://github.com/programmingwithalex">GitHub@programmingwithalex</a></p>
 
   <h3 align="center">Flask, Celery, & Nginx - AWS Deployment</h3>
 
   <p align="center">
     Guide on deploying a flask app on AWS running: celery, celery_beat, and celery_flower, with a nginx container as the entry point
     <br />
-    <a href="https://github.com/programmingwithalex/aws_celery_flask">View Demo</a>
+    <a href="https://www.youtube.com/watch?v=RBj7ctj5Sk8&list=PLbn3jWIXv_iZqYn-RxjzaGXrDTWa3OnNw&index=1">YouTube Demo</a>
     ·
     <a href="https://github.com/programmingwithalex/aws_celery_flask/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
     ·
